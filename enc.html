@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Encrypt Text • BERRY MOD APEKA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      corePlugins: { preflight: false },
+      theme: {
+        extend: {
+          colors: {
+            'berry-bg': '#0e1120',
+            'card-bg': '#131627',
+            'code-bg': '#0f1322',
+            'primary': '#647cf7',
+            'primary-light': '#7b8cff',
+            'text': '#d5d7e3'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* ---------------------------------------------------------------------- */
+    /* CSS GLOBAL & BASE */
+    /* ---------------------------------------------------------------------- */
+    :root {
+      --primary: #647cf7;
+      --primary-light: #7b8cff;
+      --bg: #131627;
+      --text: #d5d7e3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0e1120;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 30px 16px;
+      overflow-x: hidden;
+      position: relative;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+    }
+    
+    /* ---------------------------------------------------------------------- */
+    /* GLOW & SHIMMER EFFECTS */
+    /* ---------------------------------------------------------------------- */
+    .glow-button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      text-decoration: none;
+      padding: 12px 32px;
+      border-radius: 50px;
+      background: linear-gradient(90deg, #5365F7, #6b7dff);
+      letter-spacing: 1px;
+      z-index: 1;
+      overflow: hidden;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(83, 101, 247, 0.55);
+    }
+    .glow-button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      border-radius: 50px;
+      background: linear-gradient(90deg, transparent, #8a9bff, #5365F7, transparent);
+      animation: moveShine 2.8s linear infinite;
+    }
+    @keyframes moveShine {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    .copy-btn .fa-check { opacity: 0; transition: opacity 0.3s; }
+    .copy-btn:hover .fa-copy { opacity: 0; }
+    .copy-btn:hover .fa-check { opacity: 1; }
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    @media (min-width: 640px) {
+      .input-container {
+        flex-direction: row;
+        align-items: flex-end;
+      }
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* LIQUID GLASS & SIDEBAR */
+    /* ---------------------------------------------------------------------- */
+    .liquid-glass {
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    #sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 250px;
+      height: 100%;
+      z-index: 100;
+      padding: 20px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+      background: rgba(19, 22, 39, 0.9);
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-left: 1px solid rgba(100, 124, 247, 0.3);
+    }
+    #sidebar.open {
+      transform: translateX(0);
+    }
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 90;
+        display: none;
+    }
+    
+    /* Tombol Sidebar Umum */
+    .sidebar-button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-weight: 500;
+      color: var(--text);
+      transition: background 0.2s;
+    }
+    .sidebar-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Liquid Glass untuk tombol di sidebar */
+    .sidebar-button.liquid-glass-btn {
+        background: rgba(100, 124, 247, 0.1);
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(100, 124, 247, 0.1);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(100, 124, 247, 0.2);
+    }
+    .sidebar-button.liquid-glass-btn:hover {
+        background: rgba(100, 124, 247, 0.25);
+    }
+
+    /* HIGHLIGHT BARU UNTUK TOMBOL AKTIF */
+    .sidebar-button.active-highlight {
+        background: var(--primary-light);
+        color: #0e1120;
+        font-weight: 700;
+        box-shadow: 0 0 15px rgba(123, 140, 255, 0.7);
+        border: 1px solid var(--primary-light);
+    }
+    .sidebar-button.active-highlight:hover {
+        background: var(--primary);
+    }
+    
+    /* Tombol Close (X) Sidebar */
+    #sidebar .close-btn {
+        color: var(--primary);
+        font-size: 28px;
+    }
+    #sidebar .close-btn:hover {
+        color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay" onclick="closeSidebar()"></div>
+
+  <div id="sidebar">
+    <div class="flex justify-end mb-8">
+        <button onclick="closeSidebar()" class="close-btn hover:opacity-80 transition-opacity">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <h3 class="text-lg font-bold text-primary mb-4" style="font-family: 'Orbitron', sans-serif;">Navigation</h3>
+    <a href="DEC.html" id="decrypt-btn" class="sidebar-button liquid-glass-btn">
+        <i class="fas fa-lock mr-2"></i> Decrypt Tools
+    </a>
+    <a href="enc.html" id="encrypt-btn" class="sidebar-button liquid-glass-btn">
+        <i class="fas fa-lock-open mr-2"></i> Encrypt Tools
+    </a>
+  </div>
+
+  <button id="menu-btn" onclick="openSidebar()" class="liquid-glass fixed top-5 right-5 z-20 p-3 rounded-xl text-white text-xl hover:opacity-80 transition-opacity">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="max-w-4xl w-full">
+    <header class="text-center mb-10">
+      <h1 class="text-3xl md:text-4xl font-bold" style="font-family: 'Orbitron', sans-serif; background: linear-gradient(90deg, #647cf7, #b8a9ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <i class="fas fa-lock mr-2"></i>ENCRYPT THE TEXT
+      </h1>
+      <p class="text-gray-500 mt-2 text-sm">Convert Letters to Digit</p>
+    </header>
+
+    <div class="input-container">
+      <input
+        id="textInput"
+        placeholder="Masukkan teks yang ingin di enkripsi"
+        class="flex-1 px-5 py-3.5 rounded-xl bg-card-bg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder-gray-500"
+      />
+      <button onclick="encryptText()" class="glow-button">
+        <i class="fas fa-lock"></i> Encrypt this letters
+      </button>
+    </div>
+
+    <div id="error" class="hidden text-center py-4 text-red-400 font-medium"></div>
+
+    <div id="results" class="hidden">
+      <div class="bg-card-bg rounded-2xl overflow-hidden border border-gray-800">
+        <div class="flex items-center px-5 py-3 bg-code-bg border-b border-gray-800">
+          <div class="flex space-x-2 mr-4">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+          </div>
+          <span id="fileName" class="text-sm font-medium text-gray-400">Encrypted Result</span>
+          <div class="ml-auto flex gap-2">
+            <button onclick="copyCurrentCode()" class="copy-btn text-gray-400 hover:text-white">
+              <i class="fas fa-copy"></i>
+              <i class="fas fa-check absolute text-green-400 opacity-0"></i>
+            </button>
+          </div>
+        </div>
+        <pre id="codeOutput" class="p-5 text-gray-300 overflow-x-auto bg-code-bg max-h-[60vh]"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const textInput = document.getElementById('textInput');
+    const resultDiv = document.getElementById('results');
+    const codeOutput = document.getElementById('codeOutput');
+    const errorDiv = document.getElementById('error');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    // Huruf ke Angka
+    const digitMap = {
+      'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8, 'I': 9, 'J': 10, 
+      'K': 11, 'L': 12, 'M': 13, 'N': 14, 'O': 15, 'P': 16, 'Q': 17, 'R': 18, 'S': 19, 
+      'T': 20, 'U': 21, 'V': 22, 'W': 23, 'X': 24, 'Y': 25, 'Z': 26
+    };
+
+    function showError(msg) {
+      errorDiv.textContent = msg;
+      errorDiv.classList.remove('hidden');
+      resultDiv.classList.add('hidden');
+      codeOutput.textContent = '';
+    }
+
+    function encryptText() {
+      const inputText = textInput.value.trim().toUpperCase();
+      
+      errorDiv.classList.add('hidden');
+      resultDiv.classList.add('hidden');
+      codeOutput.textContent = '';
+
+      if (!inputText) {
+        return showError('Masukkan teks (huruf A-Z dan spasi) yang ingin di enkripsi dulu!');
+      }
+
+      // Pisahkan teks menjadi kata-kata berdasarkan spasi
+      const words = inputText.split(' ').filter(word => word.length > 0);
+      let encryptedWords = [];
+      let isValid = true;
+
+      for (const word of words) {
+          let encryptedWordParts = [];
+          
+          for (const char of word) {
+              if (digitMap[char]) {
+                  encryptedWordParts.push(digitMap[char]);
+              } else {
+                  showError(`Input tidak valid: Karakter "${char}" tidak bisa dienkripsi (hanya huruf A-Z dan spasi).`);
+                  isValid = false;
+                  break;
+              }
+          }
+          
+          if (!isValid) break;
+          
+          // Gabungkan angka-angka dalam satu kata dengan SPASI
+          encryptedWords.push(encryptedWordParts.join(' '));
+      }
+
+      if (isValid) {
+        // Gabungkan kata-kata yang sudah dienkripsi dengan pemisah " - "
+        const finalResult = encryptedWords.join(' - ');
+        
+        // Contoh: 8 15 19 5 1 - 12 15 22 5 - 14 1 21 22 1 12
+        codeOutput.textContent = finalResult;
+        resultDiv.classList.remove('hidden');
+      }
+    }
+
+    function copyCurrentCode() {
+      const code = codeOutput.textContent;
+      if (!code) return;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        const check = btn.querySelector('.fa-check');
+        const copy = btn.querySelector('.fa-copy');
+        
+        check.classList.remove('opacity-0');
+        copy.classList.add('opacity-0');
+        
+        setTimeout(() => {
+          check.classList.add('opacity-0');
+          copy.classList.remove('opacity-0');
+        }, 1500);
+      });
+    }
+
+    // FUNGSI SIDEBAR
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.style.display = 'block';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.style.display = 'none';
+    }
+    
+    // FUNGSI HIGHLIGHT TOMBOL AKTIF
+    function highlightActiveTool() {
+        const path = window.location.pathname.split('/').pop();
+        
+        if (path === 'DEC.html' || path === '') {
+            document.getElementById('decrypt-btn').classList.add('active-highlight');
+        } else if (path === 'enc.html') {
+            document.getElementById('encrypt-btn').classList.add('active-highlight');
+        }
+    }
+
+    // Panggil fungsi saat halaman dimuat
+    window.onload = highlightActiveTool;
+  </script>
+
+</body>
+</html>
